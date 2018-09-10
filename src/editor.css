@@ -1,0 +1,55 @@
+	textarea{
+		font-family:monospace;
+		width:100%;
+		resize:none;
+	}
+	
+	.line-numbers, #editor .editor textarea, #editor .bottombar{
+		font-family:monospace;
+	}
+	
+	#editor{
+		border: 1px solid #ebebeb;
+		border-radius: 3px;
+	}
+	
+	#editor .visible-editor{
+		display:flex;
+	}
+	
+	#editor .visible-editor .line-numbers{
+		width: 50px;
+		text-align: center;
+		background: #ebebeb;
+	}
+	
+	#editor .visible-editor .line-numbers .line{
+		display:block;
+		width:100%;
+	}
+	
+	#editor .visible-editor .line-numbers .line.active-line{
+		background:#bfbfbf;
+	}
+	
+	#editor .editor{
+		width: 100%;
+	}
+	
+	#editor .editor .textareas{
+		border:0;
+	}
+	
+	#editor .editor .textareas:focus{
+		outline:0;
+	}
+	
+	#editor .editor .textareas, #editor .visible-editor .line-numbers{
+		min-height:300px;
+	}
+	
+	#editor .bottombar{
+		background:#ebebeb;
+		font-size:12px;
+		padding:10px 5px;
+	}
