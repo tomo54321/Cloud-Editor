@@ -1,4 +1,4 @@
-# Cloud-Editor
+# Syntaxse Editor
 Editor written in HTML CSS and Javascript (jQuery). 
 
 
