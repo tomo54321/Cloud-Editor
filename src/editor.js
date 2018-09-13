@@ -10,6 +10,10 @@ app.hasBottom = true;
 			$("#editor .bottombar").remove();
 		}
 		
+		$(".display-editor").click(function(){
+			$(app.textarea).focus();
+		});
+		
 	});
 	
 	app.autoheight = function(a) {
@@ -28,6 +32,7 @@ app.hasBottom = true;
 		var code = e.keyCode || e.which;
 		app.autoheight($(app.textarea));
 		$(".line.active-line").removeClass(".active-line");
+		
 		setTimeout(updateBottomBar, 2);
 		//Tab Button
 		if (code == '9') {
@@ -62,7 +67,6 @@ app.hasBottom = true;
 		
 	});
 	
-	
 function handleDelete(){
 	setTimeout(updateLineNumbers, 1);
 }
@@ -70,7 +74,6 @@ function handleDelete(){
 function handleEnter(){
 	setTimeout(updateLineNumbers, 1);
 }
-
 
 function updateLineNumbers(){
 	line_count = $(app.textarea).val().split("\n").length;

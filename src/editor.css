@@ -4,7 +4,7 @@
 		resize:none;
 	}
 	
-	.line-numbers, #editor .editor textarea, #editor .bottombar{
+	.line-numbers, #editor .editor textarea, #editor .editor .display-editor, #editor .bottombar{
 		font-family:monospace;
 	}
 	
@@ -34,13 +34,18 @@
 	
 	#editor .editor{
 		width: 100%;
+		position: relative;
 	}
 	
 	#editor .editor .textareas{
 		border:0;
+		position: absolute;
+		top: 0px;
+		z-index: 1;
+		opacity:0;
 	}
 	
-	#editor .editor .textareas:focus{
+	#editor .editor .display-editor:focus{
 		outline:0;
 	}
 	
@@ -52,4 +57,32 @@
 		background:#ebebeb;
 		font-size:12px;
 		padding:10px 5px;
+		position:relative;
+		z-index:2;
+	}
+	
+	#editor .display-editor{
+		min-height: 300px;
+		position: relative;
+		z-index: 2;
+	}
+	
+	#editor .editor .cursor{
+		position: absolute;
+		z-index: 5;
+		height: 15px;
+		width: 1.5px;
+		background: #000;
+		top: 0;
+		animation-name: cursorBlink;
+		animation-duration: 500ms;
+		animation-iteration-count: infinite;
+	}
+	
+	
+	
+	@keyframes cursorBlink {
+		0% {opacity:1;}
+		50% {opacity:0;}
+		100% {opacity:1;}
 	}
