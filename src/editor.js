@@ -14,6 +14,7 @@ app.hasBottom = true;
 			$(app.textarea).focus();
 		});
 		
+		
 	});
 	
 	app.autoheight = function(a) {
@@ -32,7 +33,6 @@ app.hasBottom = true;
 		var code = e.keyCode || e.which;
 		app.autoheight($(app.textarea));
 		$(".line.active-line").removeClass(".active-line");
-		
 		setTimeout(updateBottomBar, 2);
 		//Tab Button
 		if (code == '9') {
@@ -67,6 +67,19 @@ app.hasBottom = true;
 		
 	});
 	
+	$('.textareas').keyup(function(e) {
+		handleHighlighting();
+	});
+
+function handleHighlighting(){
+	var ft = $(app.textarea).val();
+	ft = ft.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br/>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+	
+	ft = highlightHTML(ft);
+	
+	$('#editor-whighlights').html(ft);
+}
+	
 function handleDelete(){
 	setTimeout(updateLineNumbers, 1);
 }
@@ -93,21 +106,24 @@ function updateBottomBar(){
 	}
 }
 
-function autoLanguageTextCheck(){
-	if($(app.textarea).val().startsWith("<html>") || $(app.textarea).val().toLowerCase().startsWith("<!doctype>") || $(app.textarea).val().toLowerCase().startsWith("<!doctype html>")){
-		
-		if($(app.textarea).val().includes("<?") || $(app.textarea).val().includes("<?php")){
-			$(".doctype").text("Document Type: HTML with PHP");
-		}else
-			$(".doctype").text("Document Type: HTML");
-		
-	}else if($(app.textarea).val().startsWith("<?")){
-		$(".doctype").text("Document Type: PHP Document");
-	}else if($(app.textarea).val().toLowerCase().startsWith("#lang-css")){
-		$(".doctype").text("Document Type: Cascading Style Sheet");
-	}else if($(app.textarea).val().toLowerCase().startsWith("//lang-js")){
-		$(".doctype").text("Document Type: JavaScript");
-	}else if($(app.textarea).val().toLowerCase().startsWith("//lang-jquery")){
-		$(".doctype").text("Document Type: jQuery JavaScript");
-	}
+function highlightHTML(str){
+	
+	var colors = {
+		"tag" : "7a00ff",
+		"attr" : "e45612",
+		"quote" : "0095ff",
+	};
+
+	var st = str;
+	
+	
+	st = st.replace( new RegExp("&lt;!---(.*?)---&gt;", 'g'), "<span class='syntaxse-comment'>&lt;!---$1---&gt;</span>");
+	st = st.replace( new RegExp("&lt;!--(.*?)--&gt;", 'g'), "<span class='syntaxse-comment'>&lt;!--$1--&gt;</span>");
+	st = st.replace( new RegExp("&lt;!DOCTYPE (.*?)&gt;", 'g'), "<span class='syntaxse-comment'>&lt;!DOCTYPE $1&gt;</span>");
+	st = st.replace( new RegExp("&lt;!doctype (.*?)&gt;", 'g'), "<span class='syntaxse-comment'>&lt;!doctype $1&gt;</span>");
+	st = st.replace(/lang=/g, "<span class='syntaxse-attr'>lang=</span>");
+	st = st.replace(/"(.*?)"/g, "<span class='syntaxse-string'>&quot;$1&quot;</span>");
+	st = st.replace(/&lt;(.*?)&gt;/g, "<span class='syntaxse-tag'>&lt;$1&gt;</span>");
+
+	return st;
 }

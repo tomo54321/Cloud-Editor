@@ -4,7 +4,7 @@
 		resize:none;
 	}
 	
-	.line-numbers, #editor .editor textarea, #editor .editor .display-editor, #editor .bottombar{
+	.line-numbers, #editor .editor textarea, #editor .editor .display-editor, #editor .bottombar, #editor-whighlights{
 		font-family:monospace;
 	}
 	
@@ -38,18 +38,15 @@
 	}
 	
 	#editor .editor .textareas{
+		min-height: 300px;
 		border:0;
-		position: absolute;
-		top: 0px;
-		z-index: 1;
-		opacity:0;
 	}
 	
-	#editor .editor .display-editor:focus{
+	#editor .editor .textareas:focus{
 		outline:0;
 	}
 	
-	#editor .editor .textareas, #editor .visible-editor .line-numbers{
+	#editor .visible-editor .line-numbers{
 		min-height:300px;
 	}
 	
@@ -61,28 +58,21 @@
 		z-index:2;
 	}
 	
-	#editor .display-editor{
-		min-height: 300px;
-		position: relative;
-		z-index: 2;
+	.nice-editor{
+		min-height:300px;
+		border:1px solid #000;
+		margin:20px;
 	}
 	
-	#editor .editor .cursor{
-		position: absolute;
-		z-index: 5;
-		height: 15px;
-		width: 1.5px;
-		background: #000;
-		top: 0;
-		animation-name: cursorBlink;
-		animation-duration: 500ms;
-		animation-iteration-count: infinite;
+	.nice-editor .syntaxse-tag .syntaxse-string{
+		color:#0095ff;
 	}
-	
-	
-	
-	@keyframes cursorBlink {
-		0% {opacity:1;}
-		50% {opacity:0;}
-		100% {opacity:1;}
+	.nice-editor .syntaxse-tag .syntaxse-attr{
+		color:#e45612;
+	}
+	.nice-editor .syntaxse-tag{
+		color:#7a00ff;
+	}
+	.nice-editor .syntaxse-comment, .nice-editor .syntaxse-comment .syntaxse-tag{
+		color:#07731e!important;
 	}
