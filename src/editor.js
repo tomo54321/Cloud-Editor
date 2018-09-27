@@ -2,19 +2,35 @@ var app = {};
 		
 app.lines = 1;
 app.hasBottom = true;
+
+app.startCurBlink = 0;
+app.lang="blank";
+app.events = {};
+
+app.events.isReady = new Event("isready");
+
+
+app.settings = {};
+
 	$(document).ready(function(){
 		app.textarea = $(".textareas");
 		app.lineList = $(".line-numbers");	
-
+		
 		if(!app.hasBottom){
 			$("#editor .bottombar").remove();
 		}
 		
-		$(".display-editor").click(function(){
+		$("#editor-whighlights").click(function(){
 			$(app.textarea).focus();
 		});
 		
+		app.init();
 	});
+	
+	
+	app.init = function(){
+		$(app.textarea)[0].dispatchEvent(app.events.isReady);
+	};
 	
 	app.autoheight = function(a) {
 		if (!$(a).prop('scrollTop')) {
@@ -32,7 +48,6 @@ app.hasBottom = true;
 		var code = e.keyCode || e.which;
 		app.autoheight($(app.textarea));
 		$(".line.active-line").removeClass(".active-line");
-		
 		setTimeout(updateBottomBar, 2);
 		//Tab Button
 		if (code == '9') {
@@ -67,6 +82,22 @@ app.hasBottom = true;
 		
 	});
 	
+	$('.textareas').keyup(function(e) {
+		handleHighlighting();
+		updateCursor();
+	});
+
+function handleHighlighting(){
+	var ft = $(app.textarea).val();
+	ft = ft.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br/>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+	
+	if(app.lang != "blank"){
+		ft = highlight(ft);
+	}
+		
+	$('#editor-whighlights').html(ft);
+}
+	
 function handleDelete(){
 	setTimeout(updateLineNumbers, 1);
 }
@@ -93,21 +124,51 @@ function updateBottomBar(){
 	}
 }
 
-function autoLanguageTextCheck(){
-	if($(app.textarea).val().startsWith("<html>") || $(app.textarea).val().toLowerCase().startsWith("<!doctype>") || $(app.textarea).val().toLowerCase().startsWith("<!doctype html>")){
+
+var input = document.querySelector('.textareas'),
+    output = document.querySelector('.area-mirror span'),
+    position = document.querySelector('.syntaxse-cursor');
+
+function updateCursor(){	
 		
-		if($(app.textarea).val().includes("<?") || $(app.textarea).val().includes("<?php")){
-			$(".doctype").text("Document Type: HTML with PHP");
-		}else
-			$(".doctype").text("Document Type: HTML");
+		if(app.startCurBlink != 0){
+			clearTimeout(app.startCurBlink);
+		}
+		$(".syntaxse-cursor").addClass("isTyping");
+		app.startCurBlink = setTimeout(function(){ $(".syntaxse-cursor").removeClass("isTyping"); }, 1000);
 		
-	}else if($(app.textarea).val().startsWith("<?")){
-		$(".doctype").text("Document Type: PHP Document");
-	}else if($(app.textarea).val().toLowerCase().startsWith("#lang-css")){
-		$(".doctype").text("Document Type: Cascading Style Sheet");
-	}else if($(app.textarea).val().toLowerCase().startsWith("//lang-js")){
-		$(".doctype").text("Document Type: JavaScript");
-	}else if($(app.textarea).val().toLowerCase().startsWith("//lang-jquery")){
-		$(".doctype").text("Document Type: jQuery JavaScript");
-	}
+		$(".area-mirror").css({"width": $(app.textarea).css("width")});
+		
+         output.innerHTML = input.value.substr( 0, input.selectionStart ).replace(/\n$/,"\n\001").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+
+        /* the fun part! 
+           We use an inline element, so getClientRects[2] will return a collection of rectangles wrapping each line of text.
+           We only need the position of the last rectangle.
+         */
+        var rects = output.getClientRects(),
+            lastRect = rects[ rects.length - 1 ],
+            top = lastRect.top - input.scrollTop,
+            left = lastRect.left+lastRect.width;
+        /* position the little div and see if it matches caret position :) */
+        position.style.cssText = "top: "+(top - 8)+"px;left: "+(left - 58)+"px";
+	
 }
+
+app.settings.setDoctype=function(type){
+	if(app.lang == "blank"){
+		
+		var pseType = type.split(";")[1];
+		
+		console.log("Doctype set to "+type);
+		if(app.hasBottom){
+			$(".bottombar .doctype").text("Document Type: "+pseType);
+		}
+		
+		app.lang = pseType;
+		
+	}
+	else{
+		throw new Error("Cannot set editor language as a language has already been set.");
+	}
+	
+};
