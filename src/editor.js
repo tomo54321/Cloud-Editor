@@ -2,20 +2,35 @@ var app = {};
 		
 app.lines = 1;
 app.hasBottom = true;
+
+app.startCurBlink = 0;
+app.lang="blank";
+app.events = {};
+
+app.events.isReady = new Event("isready");
+
+
+app.settings = {};
+
 	$(document).ready(function(){
 		app.textarea = $(".textareas");
 		app.lineList = $(".line-numbers");	
-
+		
 		if(!app.hasBottom){
 			$("#editor .bottombar").remove();
 		}
 		
-		$(".display-editor").click(function(){
+		$("#editor-whighlights").click(function(){
 			$(app.textarea).focus();
 		});
 		
-		
+		app.init();
 	});
+	
+	
+	app.init = function(){
+		$(app.textarea)[0].dispatchEvent(app.events.isReady);
+	};
 	
 	app.autoheight = function(a) {
 		if (!$(a).prop('scrollTop')) {
@@ -69,14 +84,17 @@ app.hasBottom = true;
 	
 	$('.textareas').keyup(function(e) {
 		handleHighlighting();
+		updateCursor();
 	});
 
 function handleHighlighting(){
 	var ft = $(app.textarea).val();
 	ft = ft.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br/>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
 	
-	ft = highlightHTML(ft);
-	
+	if(app.lang != "blank"){
+		ft = highlight(ft);
+	}
+		
 	$('#editor-whighlights').html(ft);
 }
 	
@@ -106,24 +124,51 @@ function updateBottomBar(){
 	}
 }
 
-function highlightHTML(str){
-	
-	var colors = {
-		"tag" : "7a00ff",
-		"attr" : "e45612",
-		"quote" : "0095ff",
-	};
 
-	var st = str;
-	
-	
-	st = st.replace( new RegExp("&lt;!---(.*?)---&gt;", 'g'), "<span class='syntaxse-comment'>&lt;!---$1---&gt;</span>");
-	st = st.replace( new RegExp("&lt;!--(.*?)--&gt;", 'g'), "<span class='syntaxse-comment'>&lt;!--$1--&gt;</span>");
-	st = st.replace( new RegExp("&lt;!DOCTYPE (.*?)&gt;", 'g'), "<span class='syntaxse-comment'>&lt;!DOCTYPE $1&gt;</span>");
-	st = st.replace( new RegExp("&lt;!doctype (.*?)&gt;", 'g'), "<span class='syntaxse-comment'>&lt;!doctype $1&gt;</span>");
-	st = st.replace(/lang=/g, "<span class='syntaxse-attr'>lang=</span>");
-	st = st.replace(/"(.*?)"/g, "<span class='syntaxse-string'>&quot;$1&quot;</span>");
-	st = st.replace(/&lt;(.*?)&gt;/g, "<span class='syntaxse-tag'>&lt;$1&gt;</span>");
+var input = document.querySelector('.textareas'),
+    output = document.querySelector('.area-mirror span'),
+    position = document.querySelector('.syntaxse-cursor');
 
-	return st;
+function updateCursor(){	
+		
+		if(app.startCurBlink != 0){
+			clearTimeout(app.startCurBlink);
+		}
+		$(".syntaxse-cursor").addClass("isTyping");
+		app.startCurBlink = setTimeout(function(){ $(".syntaxse-cursor").removeClass("isTyping"); }, 1000);
+		
+		$(".area-mirror").css({"width": $(app.textarea).css("width")});
+		
+         output.innerHTML = input.value.substr( 0, input.selectionStart ).replace(/\n$/,"\n\001").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+
+        /* the fun part! 
+           We use an inline element, so getClientRects[2] will return a collection of rectangles wrapping each line of text.
+           We only need the position of the last rectangle.
+         */
+        var rects = output.getClientRects(),
+            lastRect = rects[ rects.length - 1 ],
+            top = lastRect.top - input.scrollTop,
+            left = lastRect.left+lastRect.width;
+        /* position the little div and see if it matches caret position :) */
+        position.style.cssText = "top: "+(top - 8)+"px;left: "+(left - 58)+"px";
+	
 }
+
+app.settings.setDoctype=function(type){
+	if(app.lang == "blank"){
+		
+		var pseType = type.split(";")[1];
+		
+		console.log("Doctype set to "+type);
+		if(app.hasBottom){
+			$(".bottombar .doctype").text("Document Type: "+pseType);
+		}
+		
+		app.lang = pseType;
+		
+	}
+	else{
+		throw new Error("Cannot set editor language as a language has already been set.");
+	}
+	
+};
