@@ -3,6 +3,18 @@ Editor written in HTML CSS and Javascript (jQuery).
 
 
 
-Very Basic
 
-Might turn into a proper library but it's a a starting point. Maybe also adding Syntax highlighting and suggestions but for now what's here works and it's fine.
+## To Do's
+
+
+- Fully support HTML
+- Add support for CSS, Javascript and PHP maybe more languages.
+- Turn into a functioning library
+- Add Highlighting, Copy, Paste etc.
+- Add Custom Context Menus
+- Begin building plugins for the editor.
+- Launch Syntaxse Cloud IDE.
+
+
+## View the site
+https://tomo54321.github.io/Syntaxse-Editor/ - Some demo site that I plan on turning into documentation.
